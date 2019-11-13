@@ -74,6 +74,33 @@ vector<Point> order_points (vector<Point> points){
     return answer;
 }
 
+void prepare_tranform_matrix(double transform_equations[8][9],
+                             vector<Point>& source, vector<Point>& destination) {
+    for (int i = 0; i < 8; i++) {
+        for (int j = 0; j < 9; j++) {
+            transform_equations[i][j] = 0;
+        }
+    }
+    for (unsigned i = 0; i < 4; i++) {
+        transform_equations[2*i][0] = source[i].x;
+        transform_equations[2*i][1] = source[i].y;
+        transform_equations[2*i][2] = 1;
+
+        transform_equations[2*i+1][3] = source[i].x;
+        transform_equations[2*i+1][4] = source[i].y;
+        transform_equations[2*i+1][5] = 1;
+
+        transform_equations[2*i]  [6] = - destination[i].x * source[i].x;
+        transform_equations[2*i]  [7] = - destination[i].x * source[i].y;
+        transform_equations[2*i+1][6] = - destination[i].y * source[i].x;
+        transform_equations[2*i+1][7] = - destination[i].y * source[i].y;
+
+        ////
+        transform_equations[2*i]  [8] = destination[i].x;
+        transform_equations[2*i+1][8] = destination[i].y;
+
+    }
+}
 
 void solve_matrix(int arank, double A[8][9]) {
     //Jordan-Gauss
@@ -82,16 +109,6 @@ void solve_matrix(int arank, double A[8][9]) {
     const int ncols = arank+1;
 
     stack < pair < int,int> > permutations;
-
-    cout << "start (must be the same as an input):" << endl;
-    for (int i = 0; i < nrows; i++) {
-        for (int j = 0; j < ncols; j++) {
-            cout << A[i][j]  << " ";
-        }
-        cout << endl;
-    }
-    cout << "go" << endl;
-    cout<< endl;
 
     for (int lead = 0; lead < nrows; lead++) {
         double d, m;
@@ -124,13 +141,6 @@ void solve_matrix(int arank, double A[8][9]) {
                 }
             }
         }
-        for (int i = 0; i < nrows; i++) {
-            for (int j = 0; j < ncols; j++) {
-                cout << A[i][j]  << " ";
-            }
-            cout << endl;
-        }
-        cout<< endl;
     }
 
     // The answers must be in the last columns, but we need to restore the order
@@ -176,9 +186,22 @@ int main()
     int out_width, out_height;
     in >> out_width >> out_height; //rectangle sides
     destination.push_back(Point(0, 0));
-    destination.push_back(Point(0, out_height));
-    destination.push_back(Point(out_width, out_height));
     destination.push_back(Point(out_width, 0));
+    destination.push_back(Point(out_width, out_height));
+    destination.push_back(Point(0, out_height));
+
+
+    /*source.clear();
+    destination.clear();
+    source.emplace_back(0, 0);
+    source.emplace_back(0, 1);
+    source.emplace_back(1, 1);
+    source.emplace_back(1, 0);
+    destination.emplace_back(0, 0);
+    destination.emplace_back(0, 2);
+    destination.emplace_back(2, 2);
+    destination.emplace_back(2, 0);*/
+
 
     for (int y = 0; y < in_height; y++) {
         for(int x = 0; x < in_width; x++) {
@@ -189,39 +212,7 @@ int main()
 
 
     double transform_equations[8][9];
-    for (int i = 0; i < 8; i++) {
-        for (int j = 0; j < 9; j++) {
-            transform_equations[i][j] = 0;
-        }
-    }
-    for (unsigned i = 0; i < 4; i++) {
-        transform_equations[2*i][0] = source[i].x;
-        transform_equations[2*i][1] = source[i].y;
-        transform_equations[2*i][2] = 1;
-
-        transform_equations[2*i+1][3] = source[i].x;
-        transform_equations[2*i+1][4] = source[i].y;
-        transform_equations[2*i+1][5] = 1;
-
-        transform_equations[2*i]  [6] = - destination[i].x * source[i].x;
-        transform_equations[2*i]  [7] = - destination[i].x * source[i].y;
-        transform_equations[2*i+1][6] = - destination[i].y * source[i].x;
-        transform_equations[2*i+1][7] = - destination[i].y * source[i].y;
-
-        ////
-        transform_equations[2*i]  [8] = destination[i].x;
-        transform_equations[2*i+1][8] = destination[i].y;
-
-    }
-
-    for (int i = 0; i < 8; i++) {
-        for (int j = 0; j < 9; j++) {
-            cout << transform_equations[i][j]  << " ";
-        }
-        cout << endl;
-    }
-    cout<< endl;
-
+    prepare_tranform_matrix(transform_equations, source, destination);
 
     solve_matrix(8, transform_equations);
 
@@ -253,7 +244,7 @@ int main()
             cout << out_image[r][c];
             out << out_image[r][c];
         }
-        out << endl;
+        //out << endl;
         cout << ':' << endl;
     }
 
