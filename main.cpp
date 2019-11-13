@@ -7,6 +7,9 @@
 
 using namespace std;
 
+
+const double eps = 1e-6;
+
 class Point {
 public:
     int x = 0;
@@ -97,7 +100,7 @@ static void solve_matrix(int arank, double A[8][9]) {
         double d, m;
 
         int r;
-        for (r = lead; r < nrows && A[lead][r] == 0; r++);
+        for (r = lead; r < nrows && abs(A[lead][r]) < eps; r++);
         if (r == nrows) continue;
         // The column is cleared out. There shouldn't be any non-zeroes above
         // in this case since the matrix is not singular.
@@ -112,7 +115,7 @@ static void solve_matrix(int arank, double A[8][9]) {
         for (int r = 0; r < nrows; r++) {
             d = A[lead][lead];
 
-            if (A[r][lead] == 0) continue;
+            if (abs(A[r][lead]) < eps) continue;
 
             m = A[r][lead] / d;
 
@@ -145,7 +148,7 @@ static Point multiply(double matrix[3][3], int x, int y) {
     double x1 = matrix[0][0]*x + matrix[1][0]*y + matrix[2][0];
     double y1 = matrix[0][1]*x + matrix[1][1]*y + matrix[2][1];
     double z1 = matrix[0][2]*x + matrix[1][2]*y + matrix[2][2];
-    return Point(round(x1/z1), round(y1/z1));
+    return Point(int(round(x1/z1)), int(round(y1/z1)));
 }
 
 static bool in_bounds(int c, int r, int width, int height) {
