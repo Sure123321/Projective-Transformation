@@ -4,6 +4,7 @@
 #include <stack>
 #include <cmath>
 #include <cstring>
+#include <unistd.h>
 
 using namespace std;
 
@@ -78,11 +79,11 @@ static vector<Point> order_points (vector<Point> points){
     return answer;
 }
 
-static void solve_matrix(int arank, double A[8][9]) {
+static void solve_matrix(double A[8][9]) {
     //Jordan-Gauss
 
-    const int nrows = arank;
-    const int ncols = arank+1;
+    const int nrows = 8;
+    const int ncols = 9;
 
     stack < pair < int,int> > permutations;
 
@@ -140,7 +141,7 @@ static void solve_matrix(int arank, double A[8][9]) {
     while(!permutations.empty()) {
         pair <int,int> p = permutations.top();
         permutations.pop();
-        swap(A[p.first][arank], A[p.second][arank]);
+        swap(A[p.first][nrows], A[p.second][nrows]);
     }
 }
 
@@ -155,10 +156,10 @@ static bool in_bounds(int c, int r, int width, int height) {
     return c >= 0 && c < width && r >= 0 && r < height;
 }
 
-static void prepare_transform_matrix(
+static void prepare_transform_equations(
         double transform_equations[8][9],
         const vector<Point>& source,
-        vector<Point>& destination)
+        const vector<Point>& destination)
 {
     for (unsigned i = 0; i < 8; i++) {
         for (unsigned j = 0; j < 9; j++) {
@@ -198,8 +199,10 @@ int do_test()
     destination.emplace_back(0, 1);
     destination.emplace_back(1, 1);
     destination.emplace_back(1, 0);
+    //source = order_points(source);
     double transform_equations[8][9];
-    prepare_transform_matrix(transform_equations, source, destination);
+    prepare_transform_equations(transform_equations, source, destination);
+    solve_matrix(transform_equations);
     double transform_matrix[3][3];
     for (int i = 0; i < 8; i++) {
         transform_matrix[i/3][i%3] = transform_equations[i][8];
@@ -220,6 +223,11 @@ int do_test()
 
 int main(int argc, char **argv)
 {
+    {
+        char wd[1024];
+        getcwd(wd, sizeof wd);
+        cout << "Current directory: " << wd << endl;
+    }
     if (argc >= 2 && !strcmp(argv[1], "test")) {
        return do_test();
     }
@@ -258,7 +266,7 @@ int main(int argc, char **argv)
 
 
     double transform_equations[8][9];
-    prepare_transform_matrix(transform_equations, source, destination);
+    prepare_transform_equations(transform_equations, source, destination);
 
     for (int i = 0; i < 8; i++) {
         for (int j = 0; j < 9; j++) {
@@ -269,7 +277,7 @@ int main(int argc, char **argv)
     cout<< endl;
 
 
-    solve_matrix(8, transform_equations);
+    solve_matrix(transform_equations);
 
     double transform_matrix[3][3];
     for (int i = 0; i < 8; i++) {
