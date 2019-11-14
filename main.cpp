@@ -1,4 +1,5 @@
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 #include <vector>
 #include <stack>
@@ -89,8 +90,9 @@ static void solve_matrix(double A[8][9]) {
 
     cout << "start (must be the same as an input):" << endl;
     for (int i = 0; i < nrows; i++) {
+	cout << i << ": ";
         for (int j = 0; j < ncols; j++) {
-            cout << A[i][j]  << " ";
+            cout << setw(4) << A[i][j]  << " ";
         }
         cout << endl;
     }
@@ -101,7 +103,8 @@ static void solve_matrix(double A[8][9]) {
         double d, m;
 
         int r;
-        for (r = lead; r < nrows && abs(A[lead][r]) < eps; r++);
+        for (r = lead; r < nrows && fabs(A[r][lead]) < eps; r++);
+	cout << "Iteration: lead=" << lead << " r=" << r << endl;
         if (r == nrows) continue;
         // The column is cleared out. There shouldn't be any non-zeroes above
         // in this case since the matrix is not singular.
@@ -109,14 +112,14 @@ static void solve_matrix(double A[8][9]) {
         if (r != lead) { // Make the right row a leading one
             permutations.push(make_pair(r, lead)); // Save the permutation made
             for (int i = 0; i < ncols; i++) {
-                swap(A[i][lead], A[i][r]);
+                swap(A[lead][i], A[r][i]);
             }
         }
 
+        d = A[lead][lead];
         for (int r = 0; r < nrows; r++) {
-            d = A[lead][lead];
 
-            if (abs(A[r][lead]) < eps) continue;
+            if (fabs(A[r][lead]) < eps) continue;
 
             m = A[r][lead] / d;
 
@@ -129,8 +132,9 @@ static void solve_matrix(double A[8][9]) {
             }
         }
         for (int i = 0; i < nrows; i++) {
+	    cout << i << ": ";
             for (int j = 0; j < ncols; j++) {
-                cout << A[i][j]  << " ";
+                cout << setw(4) << A[i][j]  << " ";
             }
             cout << endl;
         }
@@ -141,7 +145,16 @@ static void solve_matrix(double A[8][9]) {
     while(!permutations.empty()) {
         pair <int,int> p = permutations.top();
         permutations.pop();
+        cout << "Permutation: " << p.first << ":" << p.second << endl;
         swap(A[p.first][nrows], A[p.second][nrows]);
+    }
+    cout << "After permutations:" << endl;
+    for (int i = 0; i < nrows; i++) {
+	cout << i << ": ";
+        for (int j = 0; j < ncols; j++) {
+            cout << setw(4) << A[i][j]  << " ";
+        }
+        cout << endl;
     }
 }
 
