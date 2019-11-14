@@ -121,19 +121,19 @@ static void solve_matrix(double A[8][9]) {
 
         print_matrix(A);
 
+
         d = A[lead][lead];
+        for (int c = 0; c < ncols; c++) {
+            A[lead][c] /= d;
+        }
+
         for (int r = 0; r < nrows; r++) {
+            if (r == lead) continue;
 
-            //if (fabs(A[r][lead]) < eps) continue;
-
-            m = A[r][lead] / d;
+            m = A[r][lead];
 
             for (int c = 0; c < ncols; c++) {
-                if (r == lead) {
-                    A[r][c] /= d;
-                } else {
-                    A[r][c] -= A[lead][c] * m;
-                }
+                A[r][c] -= A[lead][c] * m;
             }
         }
 
@@ -316,8 +316,8 @@ int main(int argc, char **argv)
             cout << out_image[r][c];
             out << out_image[r][c];
         }
-        out << endl;
-        cout << ':' << endl;
+        //out << endl;
+        cout << ':';
     }
 
     in.close();
