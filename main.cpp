@@ -86,8 +86,6 @@ static void solve_matrix(double A[8][9]) {
     const int nrows = 8;
     const int ncols = 9;
 
-    stack < pair < int,int> > permutations;
-
     cout << "start (must be the same as an input):" << endl;
     for (int i = 0; i < nrows; i++) {
 	cout << i << ": ";
@@ -110,7 +108,6 @@ static void solve_matrix(double A[8][9]) {
         // in this case since the matrix is not singular.
 
         if (r != lead) { // Make the right row a leading one
-            permutations.push(make_pair(r, lead)); // Save the permutation made
             for (int i = 0; i < ncols; i++) {
                 swap(A[lead][i], A[r][i]);
             }
@@ -141,14 +138,6 @@ static void solve_matrix(double A[8][9]) {
         cout<< endl;
     }
 
-    // The answers must be in the last columns, but we need to restore the order
-    while(!permutations.empty()) {
-        pair <int,int> p = permutations.top();
-        permutations.pop();
-        cout << "Permutation: " << p.first << ":" << p.second << endl;
-        swap(A[p.first][nrows], A[p.second][nrows]);
-    }
-    cout << "After permutations:" << endl;
     for (int i = 0; i < nrows; i++) {
 	cout << i << ": ";
         for (int j = 0; j < ncols; j++) {
@@ -209,9 +198,9 @@ int do_test()
     source.emplace_back(1, 1);
     source.emplace_back(1, 0);
     destination.emplace_back(0, 0);
-    destination.emplace_back(0, 1);
-    destination.emplace_back(1, 1);
-    destination.emplace_back(1, 0);
+    destination.emplace_back(0, 2);
+    destination.emplace_back(2, 2);
+    destination.emplace_back(2, 0);
     //source = order_points(source);
     double transform_equations[8][9];
     prepare_transform_equations(transform_equations, source, destination);
