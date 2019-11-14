@@ -80,6 +80,18 @@ static vector<Point> order_points (vector<Point> points){
     return answer;
 }
 
+void print_matrix(double A[8][9]) {
+    //for testing purposes
+    for (int i = 0; i < 8; i++) {
+    cout << i << ": ";
+        for (int j = 0; j < 9; j++) {
+            cout << setprecision(5) << setw(8)  << A[i][j]  << " ";
+        }
+        cout << endl;
+    }
+    cout<< endl;
+}
+
 static void solve_matrix(double A[8][9]) {
     //Jordan-Gauss
 
@@ -87,13 +99,7 @@ static void solve_matrix(double A[8][9]) {
     const int ncols = 9;
 
     cout << "start (must be the same as an input):" << endl;
-    for (int i = 0; i < nrows; i++) {
-	cout << i << ": ";
-        for (int j = 0; j < ncols; j++) {
-            cout << setw(4) << A[i][j]  << " ";
-        }
-        cout << endl;
-    }
+    print_matrix(A);
     cout << "go" << endl;
     cout<< endl;
 
@@ -102,7 +108,7 @@ static void solve_matrix(double A[8][9]) {
 
         int r;
         for (r = lead; r < nrows && fabs(A[r][lead]) < eps; r++);
-	cout << "Iteration: lead=" << lead << " r=" << r << endl;
+        cout << "Iteration: lead=" << lead << " r=" << r << endl;
         if (r == nrows) continue;
         // The column is cleared out. There shouldn't be any non-zeroes above
         // in this case since the matrix is not singular.
@@ -113,10 +119,12 @@ static void solve_matrix(double A[8][9]) {
             }
         }
 
+        print_matrix(A);
+
         d = A[lead][lead];
         for (int r = 0; r < nrows; r++) {
 
-            if (fabs(A[r][lead]) < eps) continue;
+            //if (fabs(A[r][lead]) < eps) continue;
 
             m = A[r][lead] / d;
 
@@ -128,23 +136,12 @@ static void solve_matrix(double A[8][9]) {
                 }
             }
         }
-        for (int i = 0; i < nrows; i++) {
-	    cout << i << ": ";
-            for (int j = 0; j < ncols; j++) {
-                cout << setw(4) << A[i][j]  << " ";
-            }
-            cout << endl;
-        }
-        cout<< endl;
+
+        print_matrix(A);
+
     }
 
-    for (int i = 0; i < nrows; i++) {
-	cout << i << ": ";
-        for (int j = 0; j < ncols; j++) {
-            cout << setw(4) << A[i][j]  << " ";
-        }
-        cout << endl;
-    }
+    print_matrix(A);
 }
 
 static Point multiply(double matrix[3][3], int x, int y) {
@@ -194,14 +191,14 @@ int do_test()
     printf("Testing making transform matrix...");
     vector<Point> source, destination;
     source.emplace_back(0, 0);
-    source.emplace_back(0, 1);
-    source.emplace_back(1, 1);
-    source.emplace_back(1, 0);
+    source.emplace_back(0, 2);
+    source.emplace_back(2, 2);
+    source.emplace_back(2, 0);
     destination.emplace_back(0, 0);
-    destination.emplace_back(0, 2);
-    destination.emplace_back(2, 2);
     destination.emplace_back(2, 0);
-    //source = order_points(source);
+    destination.emplace_back(2, 3);
+    destination.emplace_back(0, 3);
+    source = order_points(source);
     double transform_equations[8][9];
     prepare_transform_equations(transform_equations, source, destination);
     solve_matrix(transform_equations);
@@ -287,6 +284,16 @@ int main(int argc, char **argv)
     }
     transform_matrix[2][2] = 1;
 
+    for (unsigned i = 0; i < 4; i++) {
+        cout << source[i].x << " " << source[i].y << "\t" << destination[i].x << " " << destination[i].y << endl;
+    }
+    cout << "transform matrix:" << endl;
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+            cout << transform_matrix[j][i] << " ";
+        } cout << endl;
+    }
+
     char out_image[max_width][max_width];
     for (int r = 0; r < out_height; r++) {
         for (int c = 0; c < out_width; c++) {
@@ -309,7 +316,7 @@ int main(int argc, char **argv)
             cout << out_image[r][c];
             out << out_image[r][c];
         }
-        //out << endl;
+        out << endl;
         cout << ':' << endl;
     }
 
