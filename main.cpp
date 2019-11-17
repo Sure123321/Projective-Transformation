@@ -270,6 +270,7 @@ int main(int argc, char **argv)
     destination.push_back(Point(out_width, out_height));
     destination.push_back(Point(0, out_height));
 
+    in.get();
     for (int y = 0; y < in_height; y++) {
         for(int x = 0; x < in_width; x++) {
             in.get(in_image[y][x]);
