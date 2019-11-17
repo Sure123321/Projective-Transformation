@@ -5,6 +5,7 @@
 #include <stack>
 #include <cmath>
 #include <cstring>
+#include <cassert>
 #include <unistd.h>
 
 using namespace std;
@@ -151,6 +152,19 @@ static Point multiply(double matrix[3][3], int x, int y) {
     return Point(int(round(x1/z1)), int(round(y1/z1)));
 }
 
+static void invert(double matrix[3][3], double new_matrix[3][3]) {
+    double det = 0;
+    for(int i=0;i<3;i++) {
+        det = det + (matrix[0][i]*(matrix[1][(i+1)%3]*matrix[2][(i+2)%3] - matrix[1][(i+2)%3]*matrix[2][(i+1)%3]));
+    }
+     for(int r=0;r<3;r++){
+        for(int c=0;c<3;c++) {
+             new_matrix[r][c] = ((matrix[(r+1)%3][(c+1)%3] * matrix[(r+2)%3][(c+2)%3])
+                     - (matrix[(r+1)%3][(c+2)%3]*matrix[(r+2)%3][(c+1)%3]))/ det;
+        }
+     }
+}
+
 static bool in_bounds(int c, int r, int width, int height) {
     return c >= 0 && c < width && r >= 0 && r < height;
 }
@@ -294,29 +308,34 @@ int main(int argc, char **argv)
         } cout << endl;
     }
 
+    double inverted_transform[3][3];
+    invert(transform_matrix, inverted_transform);
+
+    cout << "inverted:" << endl;
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+            cout << inverted_transform[j][i] << " ";
+        } cout << endl;
+    }
+
     char out_image[max_width][max_width];
     for (int r = 0; r < out_height; r++) {
         for (int c = 0; c < out_width; c++) {
-            out_image[r][c] = ' ';
-        }
-    }
-
-    for (int r = 0; r < in_height; r++) {
-        for(int c = 0; c < in_width; c++) {
-            Point dest = multiply(transform_matrix, c, r);
-            if (in_bounds(dest.x, dest.y, out_width, out_height)) {
-                out_image[dest.y][dest.x] = in_image[r][c];
+            Point dest = multiply(inverted_transform, c, r);
+            if (in_bounds(dest.x, dest.y, in_width, in_height)) {
+                out_image[r][c] = in_image[dest.y][dest.x];
+                assert(in_image[dest.y][dest.x] != '\n');
+            } else {
+                out_image[r][c] = ' ';
             }
         }
     }
-
     for (int r = 0; r < out_height; r++) {
         cout << ":";
         for (int c = 0; c < out_width; c++) {
             cout << out_image[r][c];
             out << out_image[r][c];
         }
-        //out << endl;
         cout << ':';
     }
 
